@@ -11,8 +11,6 @@ const FullApp = () => {
     <KeycloakProvider
       keycloak={keycloak}
       initConfig={keycloakProviderInitConfig}
-      // onEvent={onKeycloakEvent}
-      // onTokens={onKeycloakTokens}
     >
       <Router>
         <GlobalStyles />

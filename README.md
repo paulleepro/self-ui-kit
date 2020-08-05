@@ -44,6 +44,10 @@ IMPORTANT: the react reconciliation algorithm has a hard time when components ar
 
 Linting and formatting will take place right before each git commit via a husky pre-commit hook.
 
+## Auth
+
+This repo is set up to use keycloak. The `src/auth` folder contains utilities for different authentication strategies.
+
 ## Tests
 
 ### Start Frontend Locally
