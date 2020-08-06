@@ -1,3 +1,18 @@
+variables: 
+  - name: DEV_ENV_NAME
+    value: dev-env-name
+  - name: PROD_ENV_NAME
+    value: prod-env-name
+  - name: DEV_URL
+    value: https://appname.cluster1.endvr-digital-dev.com
+  - name: PROD_URL
+    value: https://someurl.com
+  - name: DEV_S3_BUCKET_NAME
+    value: dev-bucket-name
+  - name: PROD_S3_BUCKET_NAME
+    value: prod-bucket-name
+
+
 trigger:
 - master
 
@@ -40,7 +55,7 @@ stages:
         displayName: "Deploy"
         pool: 
           vmImage: 'ubuntu-latest'
-        environment: 'CHANGE_ENV_NAME-dev'
+        environment: $(DEV_ENV_NAME)
         strategy:
           runOnce:
             deploy:
@@ -52,16 +67,41 @@ stages:
                 inputs:
                   awsCredentials: 'CDP AWS Subscription'
                   regionName: 'us-east-2'
-                  bucketName: 'CHANGE_BUCKET_NAME'
+                  bucketName: $(DEV_S3_BUCKET_NAME)
                   sourceFolder: '$(Pipeline.Workspace)/StagingWebApp'
                   globExpressions: '**'                              
                   filesAcl: 'public-read'
+      - job: Cypress
+        dependsOn: StagingDeploy
+        steps:
+          - script: |
+              yarn
+              if [ $? -ne 0 ]; then
+                  exit 1
+              fi
+            displayName: 'yarn install'          
+          - script: |
+              export CYPRESS_BASE_URL=$(DEV_URL)
+              yarn run cy:test
+              yarn run cy:merge
+              if [ $? -ne 0 ]; then
+                  exit 1
+              fi
+            displayName: 'yarn run cy:test'          
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/reports/merged.xml' 
+              mergeTestResults: true
+              failTaskOnFailedTests: false
+              testRunTitle: Cypress Test Results
+              publishRunAttachments: true
       - job: Lighthouse
         dependsOn: StagingDeploy
         steps:
           - task: Lighthouse@1
             inputs:
-              url: 'CHANGE_DEV_URL'
+              url: $(DEV_URL)
               args: '--quiet'
               assertions: |
                 no-vulnerable-libraries = 1
@@ -97,7 +137,7 @@ stages:
         displayName: "Deploy"
         pool: 
           vmImage: 'ubuntu-latest'
-        environment: 'CHANGE_ENV_NAME-prod'
+        environment: $(PROD_ENV_NAME)
         strategy:
           runOnce:
             deploy:
@@ -109,7 +149,7 @@ stages:
                 inputs:
                   awsCredentials: 'CDP AWS Subscription'
                   regionName: 'us-west-2'
-                  bucketName: 'endeavor-speakers'
+                  bucketName: $(PROD_S3_BUCKET_NAME)
                   sourceFolder: '$(Pipeline.Workspace)/ProductionWebApp'
                   globExpressions: '**'          
                   filesAcl: 'public-read'
@@ -121,12 +161,37 @@ stages:
                   awsCommand: 'cloudfront'
                   awsSubCommand: 'create-invalidation'   
                   awsArguments: '--distribution-id ELPJK0DT806PY --paths "/index.html"'
+      - job: Cypress
+        dependsOn: StagingDeploy
+        steps:
+          - script: |
+              yarn
+              if [ $? -ne 0 ]; then
+                  exit 1
+              fi
+            displayName: 'yarn install'          
+          - script: |
+              export CYPRESS_BASE_URL=$(PROD_URL)
+              yarn run cy:test
+              yarn run cy:merge
+              if [ $? -ne 0 ]; then
+                  exit 1
+              fi
+            displayName: 'yarn run cy:test'          
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/reports/merged.xml' 
+              mergeTestResults: true
+              failTaskOnFailedTests: false
+              testRunTitle: Cypress Test Results
+              publishRunAttachments: true
       - job: Lighthouse
         dependsOn: ProductionDeploy
         steps:
           - task: Lighthouse@1
             inputs:
-              url: 'CHANGE_PROD_URL'
+              url: $(PROD_URL)
               args: '--quiet'
               assertions: |
                 no-vulnerable-libraries = 1
