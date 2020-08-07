@@ -15,9 +15,9 @@ variables:
     value: https://someurl.com
   - name: PROD_KEYCLOAK_URL
     value: https://somekeycloakurl.com/auth
-  - name: DEV_KEYCLOAK_REALM
+  - name: PROD_KEYCLOAK_REALM
     value: prodrealm
-  - name: DEV_KEYCLOAK_CLIENT_ID
+  - name: PROD_KEYCLOAK_CLIENT_ID
     value: prod-kc-client-id
   - name: DEV_S3_BUCKET_NAME
     value: dev-bucket-name
