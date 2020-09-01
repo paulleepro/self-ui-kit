@@ -12,6 +12,8 @@ import { AmplifyAuthenticator, AmplifySignUp } from "@aws-amplify/ui-react";
 import { cognitoConfig, signUpFormFields } from "./config";
 import { Box } from "react-basic-blocks";
 import { useLocation } from "react-router";
+import { fetchSingle } from "fetch-hooks-react";
+import { config } from "config";
 
 export interface IAuthState {
   isSignedIn: boolean;
