@@ -15,10 +15,15 @@ const AppHeader: FC = () => {
       </LogoLink>
 
       <Box flexDirection="row" margin="0 10px 0 0">
-        <Button as={Link} to="/auth/signin">
+        <Button as={Link} to="/auth/signin" data-test="sign-in">
           Sign In
         </Button>
-        <Button as={Link} to="/auth/signup" margin="0 0 0 20px">
+        <Button
+          as={Link}
+          to="/auth/signup"
+          margin="0 0 0 20px"
+          data-test="sign-up"
+        >
           Sign Up
         </Button>
       </Box>

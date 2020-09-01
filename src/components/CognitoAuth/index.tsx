@@ -78,7 +78,7 @@ export const AuthComponent: FC = () => {
       </Box>
       <AmplifyAuthenticator initialAuthState={initialAuthState}>
         <AmplifySignUp
-          headerText="MVP App Sign Up"
+          headerText="UI Kit Sign Up"
           slot="sign-up"
           formFields={signUpFormFields}
           usernameAlias="email"
